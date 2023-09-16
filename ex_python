@@ -15,3 +15,20 @@ class Usuario: ##classe super coesa - unico objetivo dela é definir o que é us
     def __init__(self, login, senha):
         self.login = login
         self.senha = senha
+
+def existe(usuario): 
+#obtem um cursor
+            cur.execute (
+            'SELECT * FROM  tb_usuario WHERE login = %s AND senha = %s',
+            (usuario.login, usuario.senha))
+
+        #usando o cursor, verificar resultado
+            resultado = cur.fetchone()
+
+        #devolve True ou False
+            return resultado != None
+
+def cria(usuario):
+    cur.execute("insert into tb_usuario (login, senha) values (%s,%s);",(f'{usuario.login}',f' {usuario.senha}'))
+    conn.commit()
+    return cur.rowcount >=1
