@@ -1,0 +1,72 @@
+import psycopg2
+
+conn = psycopg2.connect(
+        host = 'localhost',
+        port = '5432',
+        dbname = 'pbd',
+        user = 'postgres',
+        password = '123456'
+    )
+print("Connection established")
+
+cur = conn.cursor()
+
+class Usuario: ##classe super coesa - unico objetivo dela é definir o que é usuáriov
+    def __init__(self, login, senha):
+        self.login = login
+        self.senha = senha
+
+def existe(usuario): 
+#obtem um cursor
+            cur.execute (
+            'SELECT * FROM  tb_usuario WHERE login = %s AND senha = %s',
+            (usuario.login, usuario.senha))
+
+        #usando o cursor, verificar resultado
+            resultado = cur.fetchone()
+
+        #devolve True ou False
+            return resultado != None
+
+def cria(usuario):
+    cur.execute("insert into tb_usuario (login, senha) values (%s,%s);",(f'{usuario.login}',f' {usuario.senha}'))
+    conn.commit()
+    return cur.rowcount >=1
+
+def menu():
+    texto = '0-Fechar \n1-Login \n2-Logoff \n3-Novo Usuário '
+    usuario = None
+    op = int(input(texto))
+    while op != 0:
+        if op == 1:
+               login = input('Digite o login ')
+               senha = input('Digite a senha ')
+               usuario = Usuario (login, senha)
+               #exibir "usuário OK" ou "usuário não OK"
+               print("Login com sucesso" if existe(usuario) else "Usuario ou senha incorreto")
+        elif op == 2:
+             usuario = None
+             print('Logoff ok')
+        elif op == 3:
+             login = input('Digite o nome do novo usuario: ')
+             senha = input('Digite a senha do novo usuario: ')
+             print (f"Usuario:{login} senha:{senha}")
+             novo_usuario = Usuario (login, senha)
+             #print("Deseja confirmar o cadastro? 1 = SIM  2 = NAO")
+             #confirm = int(input("Digite 1 ou 2: "))
+             print ("Usuario inserido com sucesso!" if cria(novo_usuario) else "Cadastro não realizado")
+
+             #if confirm == 1:
+             #   conn.commit()
+            #    print('Usuario cadastrado com sucesso')
+            # else:
+             #   conn.rollback()
+            #    print('Usuario nao cadastrado')
+        op = int(input(texto))
+
+    else:
+        print("Até!")      
+
+ 
+
+menu()
